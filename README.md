@@ -1,1 +1,1 @@
-# compiler
+# Compiler course project
