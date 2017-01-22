@@ -31,3 +31,14 @@
 # Debug files
 *.dSYM/
 *.su
+
+
+
+# --------- for lex and yacc generated files------------ #
+y.tab.c
+y.tab.h
+lex.yy.c
+y.tab.o
+lex.yy.o
+a.out
+
