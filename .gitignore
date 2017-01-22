@@ -41,4 +41,4 @@ lex.yy.c
 y.tab.o
 lex.yy.o
 a.out
-
+y.output
