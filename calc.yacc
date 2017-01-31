@@ -24,6 +24,7 @@ void yyerror(char *s) {
 }
 
 int main(void) {
+
 	yyparse();
 	return 0;
 }
