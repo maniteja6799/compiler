@@ -5,6 +5,8 @@
 %}
 
 %token INTEGER
+%left '+' '-'
+%left '*' '/'
 
 %%
 

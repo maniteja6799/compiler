@@ -5,12 +5,18 @@ void yyerror(char *);
 %}
 %%
 
+[a-z]		{
+			yylval = *yylval - 'a';
+			return VARIABLE;
+		}
+
+
 [0-9]+ 		{
 			yylval = atoi(yytext);
 			return INTEGER;
 		}
 
-[-+\n] 		return *yytext;
+[-+()=/*\n]	return *yytext;
 
 [ \t]		/*skip*/
 
