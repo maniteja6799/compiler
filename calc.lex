@@ -6,7 +6,7 @@ void yyerror(char *);
 %%
 
 [a-z]		{
-			yylval = *yylval - 'a';
+			yylval = *yytext - 'a';
 			return VARIABLE;
 		}
 
@@ -16,9 +16,9 @@ void yyerror(char *);
 			return INTEGER;
 		}
 
-[-+()=/*\n]	return *yytext;
+[-+()=/*\n]	{ return *yytext; }
 
-[ \t]		/*skip*/
+[ \t]		/*skip*/;
 
 . 		yyerror("invalid charechter");
 
