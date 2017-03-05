@@ -1,12 +1,14 @@
 %{
 #include <stdlib.h>
-void yyerror(char *);
 #include "y.tab.h"
+#include "calc_include.h"
+
+void yyerror(char *);
 %}
 %%
 
 [a-z]		{
-			yylval = *yytext - 'a';
+			yylval.sIndex = *yytext - 'a';
 			return VARIABLE;
 		}
 
@@ -16,9 +18,18 @@ void yyerror(char *);
 			return INTEGER;
 		}
 
-[-+()=/*\n]	{ return *yytext; }
+[-+()=/*><;{}.]	{ return *yytext; }
 
-[ \t]		/*skip*/;
+">="		return GE;
+"<="		return LE;
+"=="		return EQ;
+"!="		return NE;
+"while" 	return WHILE;
+"if"		return IF;
+"else"		return ELSE;
+"print"		return PRINT;
+
+[ \t\n]		/*skip*/;
 
 . 		yyerror("invalid charechter");
 
