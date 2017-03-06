@@ -48,15 +48,22 @@ stmt:
 	';'				{ $$ = opr(';',2, NULL, NULL); }
 	| expr ';'		{ $$ = $1; }
 	| PRINT expr ';'{ $$ = opr(PRINT, 1, $2); }
-	| 
-statement:
-	expr			{ printf("%d\n", $1);}
-	| VARIABLE '=' expr	{ sym[$1] = $3; }
+	| VARIABLE '=' expr ';' { $$ = opr('=', 2, id($1), $3); }
+	| WHILE '(' expr ')' stmt { $$ = opr(WHILE, 2, $3, $5); }
+	| IF '(' expr ')' stmt %prec IFX { $$ = opr(IF, 2, $3, $5); }
+	| IF '(' expr ')' stmt ELSE stmt { $$ = opr (IF, 3, $3, $5, $7); }
+	| '{' stmt_list '}' { $$ = $2; }
+	;
+
+stmt_list:
+	stmt 			{ $$ = $1; }
+	| stmt_list stmt { $$ = opr(';', 2, $1, $2); }
 	;
 
 expr:
-	INTEGER			{ $$ = $1; }
-	| VARIABLE		{ $$ = sym[$1]; }
+	INTEGER			{ $$ = con($1); }
+	| VARIABLE		{ $$ = id($1); }
+	| '-' expr %prec UMINUS
 	| expr '+' expr 	{ $$ = $1 + $3; }
 	| expr '-' expr 	{ $$ = $1 - $3; }
 	| expr '*' expr		{ $$ = $1 * $3; }
