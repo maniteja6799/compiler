@@ -18,7 +18,7 @@ void yyerror(char *);
 			return INTEGER;
 		}
 
-[-+()=/*><;{}.]	{ return *yytext; }
+[-()<>=+*/;{}.]	{ return *yytext; }
 
 ">="		return GE;
 "<="		return LE;

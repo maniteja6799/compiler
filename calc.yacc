@@ -3,14 +3,15 @@
 	#include <stdlib.h>
 	#include <stdarg.h>
 	#include "calc_include.h"
+	
 	//prototypes
 	nodeType *opr(int oper, int nops, ...);
 	nodeType *id(int i );
 	nodeType *con(int value);
 	void freeNode(nodeType p);
-	int ec(nodeType *p);
+	int ex(nodeType *p);
 	int yylex(void);
-	void yyerror(char *);
+	void yyerror(char *s);
 	int sym[26];
 %}
 
@@ -69,14 +70,75 @@ expr:
 	| expr '*' expr		{ $$ = opr('*', 2, $1, $3); }
 	| expr '/' expr		{ $$ = opr('/', 2, $1, $3); }
 	| expr '<' expr		{ $$ = opr('<', 2, $1, $3); }
-	| 
+	| expr GE expr 		{ $$ = opr(GE, 2, $1, $3); }
+	| expr LE expr		{ $$ = opr(LE, 2, $1, $3); }
+	| expr NE expr		{ $$ = opr(NE, 2, $1, $3); }
+	| expr EQ expr		{ $$ = opr(EQ, 2, $1, $3); }
 	| '(' expr ')'		{ $$ = $2; }
 	;
 
 %%
 
+#define SIZEOF_NODETYPE ((char *)&p->con - (char *)p)
+
 void yyerror(char *s) {
 	fprintf(stderr, "error: %s\n", s);
+}
+
+nodeType *con (int value) {
+	nodeType *p;
+
+	if((p = malloc(sizeof(nodeType))) == NULL)
+		yyerror("out of memory");
+
+	p->type = typeCon;
+	p->con.value = value;
+
+	return p;
+}
+
+nodeType *id(int i) {
+	nodeType *p;
+	if((p = malloc(sizeof(nodeType))) == NULL)
+		yyerror("out of memory");
+
+	p->type = typrId;
+	p->id.i = i;
+
+	return p;
+}
+
+nodeType *opr(int oper, int nops, ...) {
+	va_list ap;
+	nodeType *p;
+	int i;
+
+	if( (p = malloc(sizeof(nodeType) + 
+		(nops-1) * sizeof(nodeType *)) ) == NULL)
+		yyerror("out of memory");
+
+	p->type = typeOper;
+	p->opr.oper = oper;
+	p->opr.nops = nops;
+	va_start(ap, nops);
+
+	for (int i = 0; i < nops; ++i){
+		p->opr.op[i] = va_arg(ap, nodeType*);
+	}
+	va_end(ap);
+	return p;
+
+
+}
+
+void freeNode( nodeType *p) {
+	int i;
+	if(!p) return;
+	if(p->type == typeOper) {
+		for (int i = 0; i < p->opr.nops; ++i)
+			freeNode(p->opr.op[i]);
+	}
+	free(p);
 }
 
 int main(void) {
